@@ -10,3 +10,9 @@ Seemless integration of tmux with emacs using multi-term. This project borrows i
 - Configure tmux to look more seemless with emacs
 - Implement ssh tmux connections
 - Disconnection options for using external terminals and detection of output spamming
+
+## License
+
+This package is under the GNU General Public License.
+
+Copyright (C) 2015 Todd Goodall.
