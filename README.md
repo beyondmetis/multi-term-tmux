@@ -10,7 +10,7 @@ This package has been tested with GNU emacs 24.5.1 and tmux 2.1 using Arch Linux
 
 'multi-term-tmux-remote-open (user+host &optional session-name buffer-name)' creates an emacs buffer 'buffer-name' with the remote tmux session. If the remote tmux session 'session-name' does not exist, it is created.
 
-The default 'session-name' is set by parameter multi-term-tmux-name which itself defaults to 'slave'. 'buffer-name' is set to <machine>-tmux-<session name>
+The default 'session-name' is set by parameter multi-term-tmux-name which itself defaults to 'slave'. 'buffer-name' is set to &lt;machine&gt;-tmux-&lt;session name&gt;
 
 ## TODO
 
