@@ -6,13 +6,15 @@ Seemless integration of tmux with emacs using multi-term. This project borrows i
 This package has been tested with GNU emacs 24.5.1 and tmux 2.1 using Arch Linux
 
 ## Currently Implemented 
-'multi-term-tmux-new' switches the current buffer to the local tmux session labeled "slave". If a local session named "slave" does not exist, it is created. In this way, sessions are independent of emacs and nearly seemlessly integrated.
+'multi-term-tmux-open (&optional session-name buffer-name)' creates an emacs buffer (buffer-name) with the local tmux session. If the local tmux session 'session-name' does not exist, it is created.
+
+'multi-term-tmux-remote-open (user+host &optional session-name buffer-name)' creates an emacs buffer (buffer-name) with the remote tmux session. If the remote tmux session 'session-name' does not exist, it is created.
 
 ## TODO
 
 - Add the ability to disconnect all tmux views outside of tmux
 - Configure tmux to look more seemless with emacs
-- Implement ssh tmux connections
+- Better handling of parameters and user configurations
 - Disconnection options for using external terminals and detection of output spamming
 
 ## License

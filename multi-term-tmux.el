@@ -53,6 +53,12 @@
 ;;
 
 ;;; Change log:
+
+;; 2015/12/01
+;; * ssh tmux connections now work (barely)
+;; * renamed `multi-term-tmux-new' -> multi-term-tmux-open
+;; * renamed `multi-term-tmux-remote-new' -> multi-term-tmux-remote-open
+;;
 ;; 2015/11/29
 ;; * First released.
 ;; * `multi-term-tmux-new' function
@@ -76,7 +82,6 @@
 ;;; TODO
 ;; add ability to disconnect all other views by default (for tmux sizing)
 ;; add tmux parameters to make it look seemless (bar at the top)
-;; allow ssh tmux connections
 ;; "disconnect" option
 ;;    allows launching a terminal with tmux to get separate window going
 ;;    provide escape for overloading output
@@ -89,47 +94,74 @@
 ;;; Require:
 (require 'multi-term)
 
-(defun multi-term-tmux-sessions ()
+(cl-defun multi-term-tmux-sessions (&optional (user+host nil))
     (interactive)
-    (let* ((sessionlist (shell-command-to-string "tmux list-sessions")) (sessionlist (split-string sessionlist "\n" t)) (sesslist nil)) 
-    (dolist (elt sessionlist)
-	(setq sessname (split-string elt ":" t))
-	(setq sessname (nth 0 sessname))
-	(setq sesslist (append sesslist (list sessname))))
-    sesslist))
+    (if user+host
+	(let* ((sessionlist (shell-command-to-string (concat "ssh " user+host " -q -t -t tmux list-sessions"))) (sessionlist (split-string sessionlist "\n" t)) (sesslist nil)) 
+	(dolist (elt sessionlist)
+	    (setq sessname (split-string elt ":" t))
+	    (setq sessname (nth 0 sessname))
+	    (setq sesslist (append sesslist (list sessname))))
+	sesslist)
 
-(defun multi-term-tmux-get (&optional special-shell)
+	(let* ((sessionlist (shell-command-to-string "tmux list-sessions")) (sessionlist (split-string sessionlist "\n" t)) (sesslist nil)) 
+	(dolist (elt sessionlist)
+	    (setq sessname (split-string elt ":" t))
+	    (setq sessname (nth 0 sessname))
+	    (setq sesslist (append sesslist (list sessname))))
+	sesslist)))
+
+(defun multi-term-tmux-get (term-name session-name)
   "Get term buffer.
 If option SPECIAL-SHELL is `non-nil', will use shell from user input."
   (with-temp-buffer
-    (let ((shell-name "tmux")
-	(index 1)                     ;setup new term index
-	term-name)                    ;term name
-    (setq term-name (format "tmux<#%s>-%s" index multi-term-tmux-name))
     (setq tmuxls (multi-term-tmux-sessions))
 
-    (if (member multi-term-tmux-name tmuxls)
-	(make-term term-name shell-name nil "attach" "-t" multi-term-tmux-name)
-    (make-term term-name shell-name nil "new" "-s" multi-term-tmux-name))
+    (if (member session-name tmuxls)
+	(make-term term-name "tmux" nil "attach" "-t" session-name)
+    (make-term term-name "tmux" nil "new" "-s" session-name))
     (setq term-name (concat "*" term-name "*"))
 
     (with-current-buffer term-name
         (multi-term-internal))
     (switch-to-buffer term-name)
-    term-name)))
+    term-name))
+
+(defun multi-term-tmux-remote-get (term-name session-name user+host)
+  "Get term buffer.
+If option SPECIAL-SHELL is `non-nil', will use shell from user input."
+  (with-temp-buffer
+    (setq tmuxls (multi-term-tmux-sessions user+host))
+
+    (if (member multi-term-tmux-name tmuxls)
+	(make-term term-name "ssh"  nil user+host "-t" "tmux" "attach" "-t" multi-term-tmux-name)
+    (make-term term-name "ssh" nil user+host "-t" "tmux" "new" "-s" multi-term-tmux-name))
+    (setq term-name (concat "*" term-name "*"))
+
+    (with-current-buffer term-name
+        (multi-term-internal))
+    (switch-to-buffer term-name)
+    term-name))
 
 ;;; Code:
-(defun multi-term-tmux-new (&optional session-name buffer-name screen-shell)
+(defun multi-term-tmux-open (&optional session-name buffer-name)
   "Input: provided SESSION-NAME, BUFFER-NAME, SCREEN-SHELL."
   (interactive)
   ;; get a special buffer
-  (multi-term-tmux-get)
-)
+  (setq term-name (or buffer-name (format "localhost-tmux-%s" multi-term-tmux-name)))
+  (setq session-name (or session-name multi-term-tmux-name))
 
-(defun multi-term-tmux-remote-new (&optional session-name buffer-name screen-shell)
-  "Input: provide SESSION-NAME, BUFFER-NAME, SCREEN-SHELL."
+  (multi-term-tmux-get term-name session-name))
+
+
+(defun multi-term-tmux-remote-open (user+host &optional session-name buffer-name)
+  "Input: provide USER+HOST, SESSION-NAME."
   (interactive)
-)
+
+  (setq term-name (or buffer-name (format "%s-tmux-%s" user+host multi-term-tmux-name)))
+  (setq session-name (or session-name multi-term-tmux-name))
+
+  (multi-term-tmux-remote-get term-name session-name user+host))
 
 
 ;; End:
