@@ -6,9 +6,11 @@ Seemless integration of tmux with emacs using multi-term. This project borrows i
 This package has been tested with GNU emacs 24.5.1 and tmux 2.1 using Arch Linux
 
 ## Currently Implemented 
-'multi-term-tmux-open (&optional session-name buffer-name)' creates an emacs buffer (buffer-name) with the local tmux session. If the local tmux session 'session-name' does not exist, it is created.
+'multi-term-tmux-open (&optional session-name buffer-name)' creates an emacs buffer 'buffer-name' with the local tmux session. If the local tmux session 'session-name' does not exist, it is created.
 
-'multi-term-tmux-remote-open (user+host &optional session-name buffer-name)' creates an emacs buffer (buffer-name) with the remote tmux session. If the remote tmux session 'session-name' does not exist, it is created.
+'multi-term-tmux-remote-open (user+host &optional session-name buffer-name)' creates an emacs buffer 'buffer-name' with the remote tmux session. If the remote tmux session 'session-name' does not exist, it is created.
+
+The default 'session-name' is set by parameter multi-term-tmux-name which itself defaults to 'slave'. 'buffer-name' is set to <machine>-tmux-<session name>
 
 ## TODO
 
